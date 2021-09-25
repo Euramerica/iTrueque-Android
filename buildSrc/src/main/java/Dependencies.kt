@@ -35,12 +35,24 @@ object Lifecycle {
     const val lifecycle = "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
 }
 
+object Multidex {
+
+    private const val multidexVersion = "2.0.1"
+
+    const val multidex = "androidx.multidex:multidex:$multidexVersion"
+}
+
 object Hilt {
     private const val hiltVersion = "2.38.1"
+    private const val hiltCompilerVersion = "1.0.0"
+    private const val hiltComponentVersion = "1.0.0-alpha03"
 
     const val hiltAndroid = "com.google.dagger:hilt-android:$hiltVersion"
-    const val hiltCompiler = "com.google.dagger:hilt-compiler:$hiltVersion"
+    const val hiltAndroidCompiler = "com.google.dagger:hilt-android-compiler:$hiltVersion"
     const val hiltAndroidTesting = "com.google.dagger:hilt-android-testing:$hiltVersion"
+    const val hiltCompiler = "androidx.hilt:hilt-compiler:$hiltCompilerVersion"
+    const val navigation = "androidx.hilt:hilt-navigation-compose:$hiltComponentVersion"
+    const val viewModel = "androidx.hilt:hilt-lifecycle-viewmodel:$hiltComponentVersion"
 }
 
 object Testing {
