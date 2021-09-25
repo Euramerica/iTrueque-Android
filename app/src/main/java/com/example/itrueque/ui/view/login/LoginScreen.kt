@@ -17,7 +17,7 @@ fun LoginScreen() {
 
 @Composable
 fun LoginView() {
-    Text(text = stringResource(id = R.string.app_name))
+    Text(text = "Login")
 }
 
 @Preview
