@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "572735601200",
+    "project_id": "itrueque-7eb1e",
+    "storage_bucket": "itrueque-7eb1e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:572735601200:android:ed5fafa9f5907bafcd4bf5",
+        "android_client_info": {
+          "package_name": "com.example.itrueque"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "572735601200-ql7t6mjt3ta9u0e7uso4ib3kk34h0nve.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB05_MGIm1EFtldkEomD61PiAS_iF_9ekI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "572735601200-ql7t6mjt3ta9u0e7uso4ib3kk34h0nve.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
