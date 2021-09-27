@@ -1,8 +1,8 @@
 package com.example.itrueque.model
 
+import com.google.firebase.firestore.PropertyName
+
 data class User(
-    val id: String,
-    val name: String,
-    val lastname: String,
-    val avatar: String,
+    @PropertyName("descripcion")
+    val description: String
 )

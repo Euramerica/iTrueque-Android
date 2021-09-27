@@ -3,6 +3,8 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -61,6 +63,12 @@ dependencies {
     implementation AndroidXLibs.material
 
     implementation Multidex.multidex
+
+    implementation platform(Firebase.bom)
+    implementation Firebase.crashlytics
+    implementation Firebase.analytic
+    implementation Firebase.fireStore
+    implementation Firebase.okhttp
 
     implementation Compose.composeUi
     implementation Compose.material

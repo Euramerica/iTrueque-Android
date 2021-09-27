@@ -42,6 +42,16 @@ object Multidex {
     const val multidex = "androidx.multidex:multidex:$multidexVersion"
 }
 
+object Firebase {
+    private const val bomVersion = "28.4.0"
+
+    const val bom = "com.google.firebase:firebase-bom:28.4.0"
+    const val crashlytics = "com.google.firebase:firebase-crashlytics"
+    const val analytic = "com.google.firebase:firebase-analytics"
+    const val fireStore = "com.google.firebase:firebase-firestore-ktx"
+    const val okhttp = "io.grpc:grpc-okhttp:1.32.2"
+}
+
 object Hilt {
     private const val hiltVersion = "2.38.1"
     private const val hiltCompilerVersion = "1.0.0"
