@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">iTrueque</string>
+    <string name="skip_title">Saltar</string>
+    <string name="login_background_description">Login background</string>
 </resources>
