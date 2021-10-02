@@ -15,9 +15,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.itrueque.R
 import com.example.itrueque.ui.component.button.ITruequeEmailButton
 import com.example.itrueque.ui.component.button.ITruequeGoogleButton
-import com.example.itrueque.ui.component.button.ITruequeTextButton
+import com.example.itrueque.ui.component.button.ITruequeLoginButton
 import com.example.itrueque.ui.theme.TurquoiseBlack
-import com.example.itrueque.ui.theme.White
 
 @Composable
 fun LoginScreen() {
@@ -43,16 +42,14 @@ fun LoginView() {
             modifier = Modifier.fillMaxSize()
         )
 
-        ITruequeTextButton(
-            text = stringResource(R.string.skip_title),
-            textColor = White,
-            isBoldText = true,
+        Image(
+            painter = painterResource(id = R.drawable.itrueque_name_icon),
+            contentDescription = "App name icon",
             modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 16.dp, end = 16.dp)
-        ) {
-
-        }
+                .align(Alignment.TopCenter)
+                .padding(top = 56.dp)
+                .size(300.dp)
+        )
 
         Column(
             modifier = Modifier
@@ -67,6 +64,15 @@ fun LoginView() {
 
             ITruequeEmailButton {
                 // OnClick
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            ITruequeLoginButton(
+                modifier = Modifier.fillMaxWidth(),
+                firstText = "¿Ya tienes una cuenta?",
+                secondText = "Inicia Sesión"
+            ) {
             }
         }
     }
