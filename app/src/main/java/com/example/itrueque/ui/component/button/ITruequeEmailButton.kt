@@ -1,7 +1,6 @@
 package com.example.itrueque.ui.component.button
 
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.runtime.Composable
@@ -18,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.itrueque.ui.component.text.ITruequeSmallText
 import com.example.itrueque.ui.theme.Shapes
-import com.example.itrueque.ui.theme.Turquoise
 import com.example.itrueque.ui.theme.White
 
 @Composable
@@ -33,10 +32,9 @@ fun ITruequeEmailButton(
         elevation = ButtonDefaults.elevation(defaultElevation = 0.dp),
         contentPadding = PaddingValues(all = 8.dp),
         shape = Shapes.medium,
-        border = BorderStroke(1.dp, Turquoise),
         colors = ButtonDefaults.textButtonColors(
-            backgroundColor = White,
-            contentColor = Turquoise
+            backgroundColor = MaterialTheme.colors.primary,
+            contentColor = White
         ),
         onClick = {
             onClick()
@@ -54,7 +52,8 @@ fun ITruequeEmailButton(
                 text = "Continuar con email",
                 modifier = Modifier.align(
                     Alignment.Center
-                )
+                ),
+                color = White
             )
         }
 

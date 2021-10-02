@@ -22,7 +22,7 @@ fun ITruequeSmallBoldText(
         modifier = modifier,
         fontSize = 16.sp,
         fontWeight = FontWeight.Bold,
-        color = color
+        color = color,
     )
 }
 
