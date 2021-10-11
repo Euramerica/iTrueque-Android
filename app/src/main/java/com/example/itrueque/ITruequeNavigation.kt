@@ -1,7 +1,9 @@
 package com.example.itrueque
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -16,6 +18,8 @@ object Destinations {
     const val SPLASH_ROUTE = "splash"
 }
 
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Composable
 fun ITruequeNavigation(
