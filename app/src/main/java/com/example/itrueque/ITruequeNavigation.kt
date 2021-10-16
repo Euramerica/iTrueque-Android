@@ -41,9 +41,7 @@ fun ITruequeNavigation(
 
         composable(Destinations.SPLASH_ROUTE) {
             TransitionAlphaFadeInFadeOut {
-                SplashScreen {
-                    navController.navigate(Destinations.LOGIN_ROUTE)
-                }
+                SplashScreen(navController)
             }
         }
     }

@@ -69,6 +69,7 @@ dependencies {
     implementation Firebase.analytic
     implementation Firebase.fireStore
     implementation Firebase.okhttp
+    implementation 'com.google.firebase:firebase-auth-ktx'
 
     implementation Compose.composeUi
     implementation Compose.material
@@ -76,6 +77,8 @@ dependencies {
     debugImplementation Compose.toolingUi
     androidTestImplementation Compose.composeUiTesting
     implementation Compose.activityCompose
+    implementation Compose.liveData
+    implementation Compose.icons
 
     implementation Lifecycle.lifecycle
 
