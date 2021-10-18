@@ -2,4 +2,6 @@
     <string name="app_name">iTrueque</string>
     <string name="skip_title">Saltar</string>
     <string name="login_background_description">Login background</string>
+    <string name="has_account_text">¿Ya tienes una cuenta?</string>
+    <string name="login_text">Inicia Sesión</string>
 </resources>

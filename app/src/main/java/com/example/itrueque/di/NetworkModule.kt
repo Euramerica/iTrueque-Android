@@ -1,5 +1,7 @@
 package com.example.itrueque.di
 
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -23,5 +25,11 @@ class NetworkModule {
         fireStore: FirebaseFirestore
     ): CollectionReference {
         return fireStore.collection("usuarios")
+    }
+
+    @Provides
+    fun provideFirebaseAuth(
+    ): FirebaseAuth {
+        return Firebase.auth
     }
 }

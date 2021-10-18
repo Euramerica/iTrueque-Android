@@ -27,6 +27,8 @@ object Compose {
     const val toolingUi = "androidx.compose.ui:ui-tooling:$composeVersion"
     const val composeUiTesting = "androidx.compose.ui:ui-test-junit4:$composeVersion"
     const val activityCompose = "androidx.activity:activity-compose:$activityComposeVersion"
+    const val liveData = "androidx.compose.runtime:runtime-livedata:$composeVersion"
+    const val icons = "androidx.compose.material:material-icons-extended:$composeVersion"
 }
 
 object Lifecycle {
