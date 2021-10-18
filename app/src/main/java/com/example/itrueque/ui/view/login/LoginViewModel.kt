@@ -1,19 +1,39 @@
 package com.example.itrueque.ui.view.login
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import androidx.lifecycle.viewModelScope
+import com.example.itrueque.domain.usecase.LoginUseCase
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Named
+
 
 @HiltViewModel
 class LoginViewModel
 @Inject constructor(
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    @Named("login") private val loginUC: LoginUseCase,
 ) : ViewModel() {
+
+    enum class LoginError {
+        EMPTY_FIELD_ERROR, CREDENTIAL_ERROR
+    }
+
+    sealed class UIEvent {
+        object Loading : UIEvent()
+        object SuccessLogin : UIEvent()
+        class ErrorLogin(val error: LoginError) : UIEvent()
+    }
+
+    private var _event: MutableStateFlow<UIEvent> = MutableStateFlow(UIEvent.Loading)
+    val event: StateFlow<UIEvent?>
+        get() = _event
 
     init {
 
@@ -23,32 +43,22 @@ class LoginViewModel
 
     }
 
-    fun login() {
+    fun login(email: String, password: String) {
 
-        // Initialize Firebase Auth
-        var auth: FirebaseAuth = Firebase.auth
-
-        val currentUser = auth.currentUser
-        Log.d("currentUser", currentUser?.email ?: "No hay usuario")
-        if(currentUser != null){
-            Log.d("currentUser", "logeado")
-
-        } else {
-            Log.d("currentUser", "no logeado")
-
+        if(email.isBlank() || password.isBlank()) {
+            _event.value = UIEvent.ErrorLogin(LoginError.EMPTY_FIELD_ERROR)
+            return
         }
 
-        auth.signInWithEmailAndPassword("samu6333@gmail.com", "Samu_bauty9")
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d("loginResponse", "signInWithEmail:success")
-                    val user = auth.currentUser
+        viewModelScope.launch(Dispatchers.IO) {
+            val task = loginUC.execute(email = email, password = password)
+            task.addOnCompleteListener { result ->
+                if (result.isSuccessful) {
+                    _event.value = UIEvent.SuccessLogin
                 } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w("loginResponse", "signInWithEmail:failure", task.exception)
+                    _event.value = UIEvent.ErrorLogin(LoginError.CREDENTIAL_ERROR)
                 }
             }
-
+        }
     }
 }

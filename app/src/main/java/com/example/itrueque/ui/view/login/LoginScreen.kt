@@ -1,5 +1,6 @@
 package com.example.itrueque.ui.view.login
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,6 +11,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
@@ -20,6 +22,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -28,6 +31,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.example.itrueque.Destinations
 import com.example.itrueque.R
 import com.example.itrueque.ui.component.button.ITruequeEmailButton
 import com.example.itrueque.ui.component.button.ITruequeGoogleButton
@@ -42,17 +47,40 @@ import kotlinx.coroutines.launch
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavController) {
     val viewModel: LoginViewModel = hiltViewModel()
 
+    when (val event = viewModel.event.collectAsState().value) {
+        is LoginViewModel.UIEvent.Loading -> {
+        }
+        is LoginViewModel.UIEvent.ErrorLogin -> {
+            Toast.makeText(
+                LocalContext.current,
+                when (event.error) {
+                    LoginViewModel.LoginError.EMPTY_FIELD_ERROR -> "Los campos están vacios"
+                    LoginViewModel.LoginError.CREDENTIAL_ERROR -> "Los credenciales no son correctos"
+                },
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        is LoginViewModel.UIEvent.SuccessLogin -> {
+            navController.navigate(Destinations.HOME_ROUTE)
+        }
+    }
+
     viewModel.loadData()
-    LoginView()
+    LoginView {
+        viewModel.login(email = it.first, password = it.second)
+    }
 }
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun LoginView() {
+fun LoginView(login: (Pair<String, String>) -> Unit) {
+
+    var email = ""
+    var password = ""
 
     val modalBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden
@@ -93,7 +121,7 @@ fun LoginView() {
                     LazyColumn(modifier = Modifier.padding(top = 40.dp)) {
                         item {
 
-                            val email = iTruequeInput(
+                            email = iTruequeInput(
                                 modifier = Modifier.fillMaxWidth(),
                                 label = "Correo electronico",
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -102,7 +130,7 @@ fun LoginView() {
 
                             Spacer(modifier = Modifier.height(10.dp))
 
-                            val password = iTruequeInputPassword(
+                            password = iTruequeInputPassword(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .focusRequester(focusRequester),
@@ -128,7 +156,7 @@ fun LoginView() {
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.primary),
                         shape = Shapes.medium,
                         onClick = {
-
+                            login(Pair(email, password))
                         }
                     ) {
                         Text(text = "Inicia sesión")
@@ -207,5 +235,7 @@ fun LoginView() {
 @Preview
 @Composable
 fun LoginViewPreview() {
-    LoginView()
+    LoginView {
+
+    }
 }

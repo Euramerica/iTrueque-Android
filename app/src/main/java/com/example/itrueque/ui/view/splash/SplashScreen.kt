@@ -39,7 +39,7 @@ fun SplashScreen(navController: NavController) {
             if (needLogin) {
                 navController.navigate(Destinations.LOGIN_ROUTE)
             } else {
-                // Navigate to home
+                navController.navigate(Destinations.HOME_ROUTE)
             }
         }
     }

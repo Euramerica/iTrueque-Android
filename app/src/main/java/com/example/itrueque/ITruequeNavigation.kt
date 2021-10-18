@@ -10,12 +10,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.itrueque.ui.transition.TransitionAlphaFadeInFadeOut
+import com.example.itrueque.ui.view.home.HomeScreen
 import com.example.itrueque.ui.view.login.LoginScreen
 import com.example.itrueque.ui.view.splash.SplashScreen
 
 object Destinations {
     const val LOGIN_ROUTE = "login"
     const val SPLASH_ROUTE = "splash"
+    const val HOME_ROUTE = "home"
 }
 
 @ExperimentalComposeUiApi
@@ -35,13 +37,19 @@ fun ITruequeNavigation(
 
         composable(Destinations.LOGIN_ROUTE) {
             TransitionAlphaFadeInFadeOut {
-                LoginScreen()
+                LoginScreen(navController)
             }
         }
 
         composable(Destinations.SPLASH_ROUTE) {
             TransitionAlphaFadeInFadeOut {
                 SplashScreen(navController)
+            }
+        }
+
+        composable(Destinations.HOME_ROUTE) {
+            TransitionAlphaFadeInFadeOut {
+                HomeScreen(navController)
             }
         }
     }
