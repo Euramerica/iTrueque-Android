@@ -4,4 +4,14 @@
     <string name="login_background_description">Login background</string>
     <string name="has_account_text">¿Ya tienes una cuenta?</string>
     <string name="login_text">Inicia Sesión</string>
+    <string name="empty_error_title">Los campos están vacios</string>
+    <string name="credential_error_title">Los credenciales no son correctos</string>
+    <string name="welcome_title">¡Te damos la bienvenida!</string>
+    <string name="email_title">Correo electronico</string>
+    <string name="password_title">Contraseña</string>
+    <string name="login_title">Inicia sesión</string>
+    <string name="forget_password_title">¿Has olvidado tu contraseña?</string>
+    <string name="signup_title">¡Unete a nosotros!</string>
+    <string name="name_title">Nombre y apellidos</string>
+    <string name="signup_button_title">Registrate</string>
 </resources>

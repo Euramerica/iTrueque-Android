@@ -7,4 +7,5 @@ interface AuthRepository {
 
     fun hasNeedLogin(): Boolean
     suspend fun login(email: String, password: String): Task<AuthResult>
+    suspend fun signUp(email: String, password: String): Task<AuthResult>
 }

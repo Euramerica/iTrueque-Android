@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.itrueque.domain.usecase.LoginUseCase
-import com.google.firebase.auth.FirebaseUser
+import com.example.itrueque.domain.usecase.SignUpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +19,7 @@ class LoginViewModel
 @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     @Named("login") private val loginUC: LoginUseCase,
+    @Named("signUp") private val signUpUC: SignUpUseCase,
 ) : ViewModel() {
 
     enum class LoginError {
@@ -26,12 +27,14 @@ class LoginViewModel
     }
 
     sealed class UIEvent {
+        object Normal : UIEvent()
         object Loading : UIEvent()
         object SuccessLogin : UIEvent()
-        class ErrorLogin(val error: LoginError) : UIEvent()
+        class Error(val error: LoginError) : UIEvent()
+        class SuccessSignUp(val email: String, val password: String) : UIEvent()
     }
 
-    private var _event: MutableStateFlow<UIEvent> = MutableStateFlow(UIEvent.Loading)
+    private var _event: MutableStateFlow<UIEvent> = MutableStateFlow(UIEvent.Normal)
     val event: StateFlow<UIEvent?>
         get() = _event
 
@@ -44,9 +47,10 @@ class LoginViewModel
     }
 
     fun login(email: String, password: String) {
+        _event.value = UIEvent.Loading
 
-        if(email.isBlank() || password.isBlank()) {
-            _event.value = UIEvent.ErrorLogin(LoginError.EMPTY_FIELD_ERROR)
+        if (email.isBlank() || password.isBlank()) {
+            _event.value = UIEvent.Error(LoginError.EMPTY_FIELD_ERROR)
             return
         }
 
@@ -56,7 +60,27 @@ class LoginViewModel
                 if (result.isSuccessful) {
                     _event.value = UIEvent.SuccessLogin
                 } else {
-                    _event.value = UIEvent.ErrorLogin(LoginError.CREDENTIAL_ERROR)
+                    _event.value = UIEvent.Error(LoginError.CREDENTIAL_ERROR)
+                }
+            }
+        }
+    }
+
+    fun signUp(email: String, password: String) {
+        _event.value = UIEvent.Loading
+
+        if (email.isBlank() || password.isBlank()) {
+            _event.value = UIEvent.Error(LoginError.EMPTY_FIELD_ERROR)
+            return
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val task = signUpUC.execute(email = email, password = password)
+            task.addOnCompleteListener { result ->
+                if (result.isSuccessful) {
+                    _event.value = UIEvent.SuccessSignUp(email = email, password = password)
+                } else {
+                    _event.value = UIEvent.Error(LoginError.CREDENTIAL_ERROR)
                 }
             }
         }

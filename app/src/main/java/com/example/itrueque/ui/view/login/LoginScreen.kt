@@ -10,9 +10,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -42,6 +40,7 @@ import com.example.itrueque.ui.component.text.iTruequeInput
 import com.example.itrueque.ui.component.text.iTruequeInputPassword
 import com.example.itrueque.ui.theme.Shapes
 import com.example.itrueque.ui.theme.TurquoiseBlack
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @ExperimentalComposeUiApi
@@ -50,15 +49,17 @@ import kotlinx.coroutines.launch
 fun LoginScreen(navController: NavController) {
     val viewModel: LoginViewModel = hiltViewModel()
 
+    var loading by remember { mutableStateOf(false) }
+
+    loading = viewModel.event.collectAsState().value is LoginViewModel.UIEvent.Loading
+
     when (val event = viewModel.event.collectAsState().value) {
-        is LoginViewModel.UIEvent.Loading -> {
-        }
-        is LoginViewModel.UIEvent.ErrorLogin -> {
+        is LoginViewModel.UIEvent.Error -> {
             Toast.makeText(
                 LocalContext.current,
                 when (event.error) {
-                    LoginViewModel.LoginError.EMPTY_FIELD_ERROR -> "Los campos están vacios"
-                    LoginViewModel.LoginError.CREDENTIAL_ERROR -> "Los credenciales no son correctos"
+                    LoginViewModel.LoginError.EMPTY_FIELD_ERROR -> stringResource(R.string.empty_error_title)
+                    LoginViewModel.LoginError.CREDENTIAL_ERROR -> stringResource(R.string.credential_error_title)
                 },
                 Toast.LENGTH_SHORT
             ).show()
@@ -66,21 +67,32 @@ fun LoginScreen(navController: NavController) {
         is LoginViewModel.UIEvent.SuccessLogin -> {
             navController.navigate(Destinations.HOME_ROUTE)
         }
+        is LoginViewModel.UIEvent.SuccessSignUp -> {
+            viewModel.login(event.email, event.password)
+        }
     }
 
     viewModel.loadData()
-    LoginView {
-        viewModel.login(email = it.first, password = it.second)
-    }
+    LoginView(
+        loading = loading,
+        login = {
+            viewModel.login(email = it.first, password = it.second)
+        },
+        signUp = {
+            viewModel.signUp(email = it.first, password = it.second)
+        })
 }
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun LoginView(login: (Pair<String, String>) -> Unit) {
+fun LoginView(
+    loading: Boolean,
+    login: (Pair<String, String>) -> Unit,
+    signUp: (Pair<String, String>) -> Unit
+) {
 
-    var email = ""
-    var password = ""
+    var isLogin by remember { mutableStateOf(true) }
 
     val modalBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden
@@ -89,89 +101,24 @@ fun LoginView(login: (Pair<String, String>) -> Unit) {
 
     ModalBottomSheet(
         bottomSheetContent = {
-            val (focusRequester) = FocusRequester.createRefs()
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 32.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
-            ) {
-                Column(Modifier.fillMaxWidth()) {
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Text(
-                            text = "¡Te damos la bienvenida!",
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            modifier = Modifier.width(200.dp)
-                        )
-                        IconButton(
-                            onClick = {
-                                scope.launch { modalBottomSheetState.animateTo(ModalBottomSheetValue.Hidden) }
-                            }) {
-                            Image(
-                                imageVector = Icons.Outlined.Close,
-                                contentDescription = "Close icon"
-                            )
-                        }
-                    }
-
-                    LazyColumn(modifier = Modifier.padding(top = 40.dp)) {
-                        item {
-
-                            email = iTruequeInput(
-                                modifier = Modifier.fillMaxWidth(),
-                                label = "Correo electronico",
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                                focusRequester = focusRequester
-                            )
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            password = iTruequeInputPassword(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .focusRequester(focusRequester),
-                                label = "Contraseña",
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                            )
-                        }
-                    }
-                }
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(BottomCenter)
-                ) {
-                    OutlinedButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp),
-                        elevation = ButtonDefaults.elevation(defaultElevation = 0.dp),
-                        contentPadding = PaddingValues(all = 8.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colors.primary),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.primary),
-                        shape = Shapes.medium,
-                        onClick = {
-                            login(Pair(email, password))
-                        }
-                    ) {
-                        Text(text = "Inicia sesión")
-                    }
-
-                    Text(
-                        text = "¿Has olvidado tu contraseña?",
-                        modifier = Modifier
-                            .align(CenterHorizontally)
-                            .padding(8.dp),
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-
+            if (isLogin) {
+                LoginView(
+                    loading = loading,
+                    login = {
+                        login(it)
+                    },
+                    modalBottomSheetState = modalBottomSheetState,
+                    scope = scope
+                )
+            } else {
+                SignUpView(
+                    loading = loading,
+                    signUp = {
+                        signUp(it)
+                    },
+                    modalBottomSheetState = modalBottomSheetState,
+                    scope = scope
+                )
             }
         },
         contentBehind = {
@@ -209,7 +156,10 @@ fun LoginView(login: (Pair<String, String>) -> Unit) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     ITruequeEmailButton {
-                        // OnClick
+                        scope.launch {
+                            isLogin = false
+                            modalBottomSheetState.animateTo(ModalBottomSheetValue.Expanded)
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(32.dp))
@@ -220,7 +170,8 @@ fun LoginView(login: (Pair<String, String>) -> Unit) {
                         secondText = stringResource(R.string.login_text)
                     ) {
                         scope.launch {
-                            scope.launch { modalBottomSheetState.animateTo(ModalBottomSheetValue.Expanded) }
+                            isLogin = true
+                            modalBottomSheetState.animateTo(ModalBottomSheetValue.Expanded)
                         }
                     }
                 }
@@ -229,13 +180,232 @@ fun LoginView(login: (Pair<String, String>) -> Unit) {
     )
 }
 
+@ExperimentalMaterialApi
+@ExperimentalComposeUiApi
+@Composable
+fun LoginView(
+    loading: Boolean,
+    login: (Pair<String, String>) -> Unit,
+    modalBottomSheetState: ModalBottomSheetState,
+    scope: CoroutineScope
+) {
+
+    var email = ""
+    var password = ""
+    val (focusRequester) = FocusRequester.createRefs()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 32.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
+    ) {
+        Column(Modifier.fillMaxWidth()) {
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = stringResource(R.string.welcome_title),
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.width(200.dp)
+                )
+                IconButton(
+                    onClick = {
+                        scope.launch { modalBottomSheetState.animateTo(ModalBottomSheetValue.Hidden) }
+                    }) {
+                    Image(
+                        imageVector = Icons.Outlined.Close,
+                        contentDescription = "Close icon"
+                    )
+                }
+            }
+
+            LazyColumn(
+                modifier = Modifier.padding(top = 40.dp),
+                horizontalAlignment = CenterHorizontally
+            ) {
+                item {
+
+                    email = iTruequeInput(
+                        modifier = Modifier.fillMaxWidth(),
+                        label = stringResource(R.string.email_title),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        focusRequester = focusRequester
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    password = iTruequeInputPassword(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester),
+                        label = stringResource(R.string.password_title),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    )
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    if (loading) CircularProgressIndicator()
+                }
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(BottomCenter)
+        ) {
+            OutlinedButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                elevation = ButtonDefaults.elevation(defaultElevation = 0.dp),
+                contentPadding = PaddingValues(all = 8.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colors.primary),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.primary),
+                shape = Shapes.medium,
+                onClick = {
+                    login(Pair(email, password))
+                }
+            ) {
+                Text(text = stringResource(R.string.login_title))
+            }
+
+            Text(
+                text = stringResource(R.string.forget_password_title),
+                modifier = Modifier
+                    .align(CenterHorizontally)
+                    .padding(8.dp),
+                fontSize = 14.sp,
+                color = Color.Gray
+            )
+        }
+    }
+}
+
+@ExperimentalMaterialApi
+@ExperimentalComposeUiApi
+@Composable
+fun SignUpView(
+    loading: Boolean,
+    signUp: (Pair<String, String>) -> Unit,
+    modalBottomSheetState: ModalBottomSheetState,
+    scope: CoroutineScope
+) {
+
+    var name = ""
+    var email = ""
+    var password = ""
+
+    val (focusRequester) = FocusRequester.createRefs()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 32.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
+    ) {
+        Column(Modifier.fillMaxWidth()) {
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = stringResource(R.string.signup_title),
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.width(200.dp)
+                )
+                IconButton(
+                    onClick = {
+                        scope.launch { modalBottomSheetState.animateTo(ModalBottomSheetValue.Hidden) }
+                    }) {
+                    Image(
+                        imageVector = Icons.Outlined.Close,
+                        contentDescription = "Close icon"
+                    )
+                }
+            }
+
+            LazyColumn(
+                modifier = Modifier.padding(top = 40.dp),
+                horizontalAlignment = CenterHorizontally
+            ) {
+                item {
+
+                    name = iTruequeInput(
+                        modifier = Modifier.fillMaxWidth(),
+                        label = stringResource(R.string.name_title),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        focusRequester = focusRequester
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    email = iTruequeInput(
+                        modifier = Modifier.fillMaxWidth(),
+                        label = stringResource(R.string.email_title),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        focusRequester = focusRequester
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    password = iTruequeInputPassword(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester),
+                        label = stringResource(R.string.password_title),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    )
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    if (loading) CircularProgressIndicator()
+                }
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(BottomCenter)
+                .padding(8.dp)
+        ) {
+            OutlinedButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                elevation = ButtonDefaults.elevation(defaultElevation = 0.dp),
+                contentPadding = PaddingValues(all = 8.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colors.primary),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.primary),
+                shape = Shapes.medium,
+                onClick = {
+                    signUp(Pair(email, password))
+                }
+            ) {
+                Text(text = stringResource(R.string.signup_button_title))
+            }
+        }
+    }
+}
+
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Preview
 @Composable
 fun LoginViewPreview() {
-    LoginView {
+    LoginView(
+        loading = true,
+        login = {
 
-    }
+        },
+        signUp = {
+
+        }
+    )
 }
